@@ -1,92 +1,73 @@
-# Obsidian Sample Plugin
+# Root View
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+A custom, hierarchy-aware graph visualization plugin for [Obsidian](https://obsidian.md), built as an alternative to the native Graph View — designed for vaults with thousands of notes where the default graph becomes unreadable.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+## Why
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
+Obsidian's built-in graph view treats every note the same size and offers no way to distinguish structurally important notes ("hubs") from leaf notes, nor to explore a note's ancestry/descendants in isolation. Root View was built to solve that for a personal knowledge base with a strict parent → child linking convention (general concepts link to specific instances).
 
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and outputs a Notice on click.
-- Registers a global interval which logs 'setInterval' to the console.
+## Features
 
-## First time developing plugins?
+- **Reachability-based node sizing** — notes with more reachable connections render larger
+- **Automatic core & hub detection** — globally important "root" notes (orange) and locally dense cluster hubs (yellow) are detected and labeled automatically, independent of manual tagging
+- **Cycle detection** — strongly connected components (via Tarjan's algorithm) are found and rendered as dashed edges, distinguishing true hierarchy from cross-links
+- **Directional arrows** — edges show parent → child direction at a glance
+- **Zoom-stable labels** — core/hub labels stay legible at any zoom level; leaf labels fade in as you zoom closer
+- **Label collision avoidance** — an iterative de-overlap pass keeps important labels readable even in dense regions
+- **Click to open** — clicking any node opens the corresponding note
+- **Drag to reposition** — manually rearrange nodes; the layout settles back around your changes
+- **Search** — find any note by name, with a results list and auto-zoom to the match
+- **Ancestor/descendant filter** — select a note to see only its strict ancestor chain and descendant chain (never cross-contaminated with siblings), rendered on its own for performance and clarity
+- **Performance-conscious by design** — the graph loads a filtered subgraph on demand rather than the entire vault by default, keeping CPU load low on large vaults (1000+ notes)
 
-Quick starting guide for new plugin devs:
+## Installation
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `src/main.ts` to `main.js`.
-- Make changes to `src/main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+This plugin isn't yet on the Community Plugin Store. To install manually:
 
-## Releasing new releases
+1. Clone this repository
+2. `npm install`
+3. `npm run build`
+4. Copy (or symlink) the folder into `<YourVault>/.obsidian/plugins/root-view/`
+5. Enable "Root View" in Obsidian's Community Plugins settings
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
-
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
-
-## Adding your plugin to the community plugin list
-
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
-
-## How to use
-
-- Clone this repo.
-- Make sure your NodeJS is at least v18 (`node --version`).
-- `npm i` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint
-
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code.
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-	"fundingUrl": "https://buymeacoffee.com"
-}
+For development with live rebuilds:
+```bash
+npm run dev
 ```
 
-If you have multiple URLs, you can also do:
+## Usage
 
-```json
-{
-	"fundingUrl": {
-		"Buy Me a Coffee": "https://buymeacoffee.com",
-		"GitHub Sponsor": "https://github.com/sponsors",
-		"Patreon": "https://www.patreon.com/"
-	}
-}
-```
+Open Root View from the ribbon icon. You'll see a start screen with two options:
 
-## API Documentation
+- **Load full graph** — renders your entire vault (best for smaller vaults or a full overview)
+- **Filter to a note** — search for a specific note and load only its ancestor + descendant chain, which is dramatically faster on large vaults
 
-See https://docs.obsidian.md
+Once loaded:
+- **Scroll** to zoom, **drag the background** to pan
+- **Click a node** to open that note
+- **Drag a node** to reposition it manually
+- Use the **search box** (top-left) to locate and jump to any visible note
+- Use the **filter box** to switch to a different note's ancestor/descendant view without returning to the start screen
+
+## How it works
+
+- Node data comes from Obsidian's `app.metadataCache.resolvedLinks`
+- Reachability is computed via BFS from each note
+- "Core" nodes are the top-N notes by global reachability (configurable threshold)
+- "Hub" nodes are notes with many direct outgoing links, independent of reachability — this catches structurally important notes (like a "Movies" index) that reachability alone would miss
+- Cycles are detected via Tarjan's strongly-connected-components algorithm, restricted to the currently loaded subgraph
+- Layout is a D3 force simulation (`forceManyBody`, `forceLink`, `forceCollide`) with an additional custom radial-spread force to push leaf notes outward from their nearest hub, encouraging thematic clustering in 2D space
+
+## Tech stack
+
+- TypeScript
+- [D3.js](https://d3js.org/) (force simulation, zoom, drag)
+- esbuild (via the official Obsidian plugin template)
+
+## Status
+
+This is a personal project, actively evolving. It's built around a specific vault convention (strict parent → child linking, general → specific), so results may vary on vaults structured differently.
+
+## License
+
+MIT — see [LICENSE](LICENSE)
