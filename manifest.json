@@ -1,0 +1,10 @@
+{
+  "id": "root-view",
+  "name": "Root View",
+  "version": "1.0.0",
+  "minAppVersion": "...",
+  "description": "Hierarchie- und reichweitenbasierte Graph-Visualisierung",
+  "author": "Daniel",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}
