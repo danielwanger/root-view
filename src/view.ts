@@ -62,8 +62,10 @@ export class RootView extends ItemView {
     if (!container) return;
     container.empty();
 
-    this.prepared = this.prepareData();
-    this.showStartScreen(container);
+    this.app.workspace.onLayoutReady(() => {
+      this.prepared = this.prepareData();
+      this.showStartScreen(container);
+    });
   }
 
   prepareData(): PreparedData {
@@ -77,6 +79,7 @@ export class RootView extends ItemView {
         nodeIdSet.add(target);
       }
     }
+
     const allNodeIds = Array.from(nodeIdSet);
 
     const reachability = computeReachability(resolvedLinks, allNodeIds);
