@@ -68,6 +68,20 @@ export class RootView extends ItemView {
     });
   }
 
+  async openFilteredForNote(notePath: string) {
+    if (!this.prepared) {
+      this.prepared = this.prepareData();
+    }
+    const { resolvedLinks, reverseLinks } = this.prepared;
+    const ancestors = getAncestors(reverseLinks, notePath);
+    const descendants = getDescendants(resolvedLinks, notePath);
+    const combined = new Set([...ancestors, ...descendants]);
+
+    const container = this.containerEl.children[1] as HTMLElement;
+    if (!container) return;
+    this.startFilteredRender(container, combined);
+  }
+
   prepareData(): PreparedData {
     const resolvedLinks = this.app.metadataCache.resolvedLinks;
     const reverseLinks = buildReverseLinks(resolvedLinks);
