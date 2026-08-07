@@ -10,7 +10,7 @@ export default class RootViewPlugin extends Plugin {
       (leaf: WorkspaceLeaf) => new RootView(leaf)
     );
 
-    this.addRibbonIcon('waypoints', 'Root View öffnen', () => {
+    this.addRibbonIcon('view', 'Root View öffnen', () => {
       this.activateView();
     });
 

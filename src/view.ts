@@ -54,7 +54,7 @@ export class RootView extends ItemView {
   }
 
   getIcon() {
-    return 'waypoints';
+    return 'view';
   }
 
   async onOpen() {
