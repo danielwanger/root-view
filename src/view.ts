@@ -54,7 +54,7 @@ export class RootView extends ItemView {
   }
 
   getIcon() {
-    return 'git-fork';
+    return 'waypoints';
   }
 
   async onOpen() {
