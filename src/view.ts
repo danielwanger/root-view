@@ -11,6 +11,7 @@ import {
   getDescendants,
   RawLinks,
   buildFilteredLinks,
+  sortByRelevance,
 } from './graph-utils';
 
 export const ROOT_VIEW_TYPE = 'root-view';
@@ -154,9 +155,11 @@ export class RootView extends ItemView {
       resultsList.innerHTML = '';
       if (!query) return;
 
-      const matches = this.prepared!.allNodeIds
-        .filter(id => getDisplayName(id).toLowerCase().includes(query))
-        .slice(0, 30);
+      const matches = sortByRelevance(
+        this.prepared!.allNodeIds.filter(id => getDisplayName(id).toLowerCase().includes(query)),
+        query,
+        getDisplayName
+      ).slice(0, 30);
 
       matches.forEach(id => {
         const item = resultsList.createEl('div');
@@ -609,9 +612,11 @@ export class RootView extends ItemView {
         return;
       }
 
-      const matches = nodes
-        .filter(n => getDisplayName(n.id).toLowerCase().includes(query))
-        .slice(0, 30);
+      const matches = sortByRelevance(
+        nodes.filter(n => getDisplayName(n.id).toLowerCase().includes(query)),
+        query,
+        n => getDisplayName(n.id)
+      ).slice(0, 30);
 
       if (matches.length === 0) {
         searchResultsList.style.display = 'none';
@@ -643,10 +648,11 @@ export class RootView extends ItemView {
         return;
       }
 
-      // Gegen ALLE Notizen suchen, nicht nur die aktuell geladene Teilmenge
-      const matches = this.prepared!.allNodeIds
-        .filter(id => getDisplayName(id).toLowerCase().includes(query))
-        .slice(0, 30);
+      const matches = sortByRelevance(
+        this.prepared!.allNodeIds.filter(id => getDisplayName(id).toLowerCase().includes(query)),
+        query,
+        getDisplayName
+      ).slice(0, 30);
 
       if (matches.length === 0) {
         filterResultsList.style.display = 'none';

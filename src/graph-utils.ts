@@ -222,3 +222,28 @@ export function buildFilteredLinks(resolvedLinks: RawLinks, filterSet: Set<strin
   }
   return filtered;
 }
+
+/**
+ * Sortiert IDs nach Relevanz zu einer Suchanfrage: exakte Treffer zuerst,
+ * dann Treffer die mit der Query beginnen, dann alphabetisch.
+ */
+export function sortByRelevance<T>(
+  items: T[],
+  query: string,
+  getName: (item: T) => string
+): T[] {
+  const q = query.toLowerCase();
+  return [...items].sort((a, b) => {
+    const aName = getName(a).toLowerCase();
+    const bName = getName(b).toLowerCase();
+    const aExact = aName === q;
+    const bExact = bName === q;
+    if (aExact && !bExact) return -1;
+    if (!aExact && bExact) return 1;
+    const aStarts = aName.startsWith(q);
+    const bStarts = bName.startsWith(q);
+    if (aStarts && !bStarts) return -1;
+    if (!aStarts && bStarts) return 1;
+    return aName.localeCompare(bName);
+  });
+}
